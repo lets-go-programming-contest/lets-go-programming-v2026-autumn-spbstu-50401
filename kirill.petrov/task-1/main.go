@@ -13,11 +13,13 @@ func main() {
     fmt.Println(a - b)
   } else if (s == "*") {
     fmt.Println(a * b)
-  } else {
+  } else if (s == "/") {
     if (b == 0) {
       fmt.Println("Division by zero")
     } else {
       fmt.Println(a / b)
     }
+  } else {
+    fmt.Println("Invalid operation")
   }
 }
