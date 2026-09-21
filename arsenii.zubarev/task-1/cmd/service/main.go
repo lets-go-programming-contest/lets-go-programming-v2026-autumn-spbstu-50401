@@ -39,6 +39,7 @@ func main() {
 	case "/":
 		if num2 == 0 {
 			fmt.Println("Division by zero")
+			return
 		}
 		result /= num2
 	default:
