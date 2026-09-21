@@ -42,7 +42,8 @@ func main() {
 		}
 		result /= num2
 	default:
-		fmt.Printf("Unrecognized sign: %c\n", sign)
+		fmt.Println("Invalid operation")
+		return
 
 	}
 	fmt.Println(result)
