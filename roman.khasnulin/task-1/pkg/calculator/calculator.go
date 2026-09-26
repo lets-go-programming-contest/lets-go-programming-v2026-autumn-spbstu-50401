@@ -17,6 +17,6 @@ type Number interface {
 		~float32 | ~float64
 }
 
-func Calculate[T Number](first T, second T, operand byte) (int, error) {
+func Calculate[T Number](first T, second T, operand string) (T, error) {
 	return 0, nil
 }
