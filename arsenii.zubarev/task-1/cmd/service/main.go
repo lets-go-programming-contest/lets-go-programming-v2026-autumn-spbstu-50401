@@ -6,22 +6,22 @@ import (
 
 func main() {
 	var num1 int
-	_, err1 := fmt.Scan(&num1)
-	if err1 != nil {
+	_, err := fmt.Scan(&num1)
+	if err != nil {
 		fmt.Println("Invalid first operand")
 		return
 	}
 
 	var num2 int
-	_, err2 := fmt.Scan(&num2)
-	if err2 != nil {
+	_, err = fmt.Scan(&num2)
+	if err != nil {
 		fmt.Println("Invalid second operand")
 		return
 	}
 
 	var sign string
-	_, errSign := fmt.Scan(&sign)
-	if errSign != nil || len(sign) != 1 {
+	_, err = fmt.Scan(&sign)
+	if err != nil || len(sign) != 1 {
 		fmt.Println("Invalid operation")
 		return
 	}
