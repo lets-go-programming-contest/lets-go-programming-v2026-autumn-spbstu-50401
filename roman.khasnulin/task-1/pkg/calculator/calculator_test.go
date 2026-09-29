@@ -15,7 +15,6 @@ type testCase[T Number] struct {
 }
 
 func TestCalculateInt(t *testing.T) {
-
 	testCases := []testCase[int]{
 		{name: "sum positive test", n1: 1, n2: 2, op: "+", expected: 3, expectedErr: nil},
 		{name: "subtract positive test", n1: 3, n2: 2, op: "-", expected: 1, expectedErr: nil},
@@ -44,11 +43,9 @@ func TestCalculateInt(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 func TestCalculateFloat64(t *testing.T) {
-
 	testCases := []testCase[float64]{
 		{name: "sum positive test", n1: 1.0, n2: 2.0, op: "+", expected: 3.0, expectedErr: nil},
 		{name: "subtract positive test", n1: 5.75, n2: 3.25, op: "-", expected: 2.5, expectedErr: nil},
@@ -72,5 +69,4 @@ func TestCalculateFloat64(t *testing.T) {
 			}
 		})
 	}
-
 }
