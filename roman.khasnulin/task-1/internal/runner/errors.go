@@ -22,3 +22,11 @@ func (op *OperandError) Error() string {
 		return "Invalid operand"
 	}
 }
+
+func (op *OperandError) Is(target error) bool {
+	t, ok := target.(*OperandError)
+	if !ok {
+		return false
+	}
+	return op.Pos == t.Pos && op.Read == t.Read
+}
