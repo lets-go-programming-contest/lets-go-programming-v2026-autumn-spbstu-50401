@@ -54,7 +54,7 @@ func TestCalculateFloat64(t *testing.T) {
 		{name: "subtract positive test", n1: 5.75, n2: 3.25, op: "-", expected: 2.5, expectedErr: nil},
 		{name: "multiple positive test", n1: 1.25, n2: 4, op: "*", expected: 5, expectedErr: nil},
 		{name: "divide positive test", n1: 13.0, n2: 4.0, op: "/", expected: 3.25, expectedErr: nil},
-		{name: "sum small nums positive test", n1: 0.1, n2: 0.2, op: "/", expected: 3.25, expectedErr: nil},
+		{name: "sum small nums positive test", n1: 0.1, n2: 0.2, op: "+", expected: 0.3, expectedErr: nil},
 		{name: "divide negative test", n1: 5, n2: 0, op: "/", expected: 0, expectedErr: ErrDivByZero},
 	}
 
