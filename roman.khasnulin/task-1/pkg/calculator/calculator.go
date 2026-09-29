@@ -17,36 +17,46 @@ type Number interface {
 		~float32 | ~float64
 }
 
+type binaryOp[T Number] func(first T, second T) (T, error)
+
 func Calculate[T Number](first, second T, operator string) (T, error) {
+	operate, err := selectOperation[T](operator)
+	if err != nil {
+		return 0, err
+	}
+	return operate(first, second)
+}
+
+func selectOperation[T Number](operator string) (binaryOp[T], error) {
 	switch operator {
 	case "+":
-		return sum(first, second), nil
+		return add, nil
 	case "-":
-		return subtract(first, second), nil
+		return subtract, nil
 	case "*":
-		return multiply(first, second), nil
+		return multiply, nil
 	case "/":
-		if second == 0 {
-			return 0, ErrDivByZero
-		}
-		return divide(first, second), nil
+		return divide, nil
 	default:
-		return 0, ErrInvalidOperator
+		return nil, ErrInvalidOperator
 	}
 }
 
-func sum[T Number](first T, second T) T {
-	return first + second
+func add[T Number](first, second T) (T, error) {
+	return first + second, nil
 }
 
-func subtract[T Number](first T, second T) T {
-	return first - second
+func subtract[T Number](first, second T) (T, error) {
+	return first - second, nil
 }
 
-func multiply[T Number](first T, second T) T {
-	return first * second
+func multiply[T Number](first, second T) (T, error) {
+	return first * second, nil
 }
 
-func divide[T Number](first T, second T) T {
-	return first / second
+func divide[T Number](first, second T) (T, error) {
+	if second == 0 {
+		return 0, ErrDivByZero
+	}
+	return first / second, nil
 }
