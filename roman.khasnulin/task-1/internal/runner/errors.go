@@ -25,7 +25,7 @@ func (op *OperandError) Error() string {
 
 func (op *OperandError) Is(target error) bool {
 	t, ok := target.(*OperandError)
-	if !ok {
+	if !ok || t == nil || op == nil {
 		return false
 	}
 	return op.Pos == t.Pos && op.Read == t.Read
