@@ -4,7 +4,6 @@ import (
 	"fmt"
 )
 
-type Temperature uint8
 type Direction uint8
 
 const (
@@ -53,14 +52,13 @@ func main() {
 	for nI := 0; nI < n; nI++ {
 		_, err := fmt.Scan(&k)
 		if err != nil {
-			fmt.Println("Invalin K parameter")
+			fmt.Println("Invalid K parameter")
 			return
 		}
 
-
 		var (
-			maxBottom uint8 = 15
-			minTop    uint8 = 30
+			maxBottom uint8 = tempBoundaryMin
+			minTop    uint8 = tempBoundaryMax
 		)
 		for kI := 0; kI < k; kI++ {
 			var operation string
@@ -103,7 +101,7 @@ func main() {
 			}
 			fmt.Println(result)
 		}
-	
+
 	}
 
 }
