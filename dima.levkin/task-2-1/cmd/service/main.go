@@ -13,8 +13,8 @@ const (
 )
 const defaultResult = -1
 const (
-	temperatureBoundaryMax = 30
-	temperatureBoundaryMin = 15
+	tempBoundaryMax = 30
+	tempBoundaryMin = 15
 
 	nLimitation = 1000
 	kLimitation = 1000
@@ -57,8 +57,11 @@ func main() {
 			return
 		}
 
-		directions := make([]Direction, 0, k)
-		temperatures := make([]Temperature, 0, k)
+
+		var (
+			maxBottom uint8 = 15
+			minTop    uint8 = 30
+		)
 		for kI := 0; kI < k; kI++ {
 			var operation string
 
@@ -74,44 +77,33 @@ func main() {
 				return
 			}
 
-			var temperature Temperature
-			_, err = fmt.Scan(&temperature)
+			var temp uint8
+			_, err = fmt.Scan(&temp)
 			if err != nil {
 				fmt.Println("Invalid temperature input")
 				return
 			}
-			directions = append(directions, direction)
-			temperatures = append(temperatures, temperature)
-		}
-
-		var (
-			maxBottom uint8 = 15
-			minTop    uint8 = 30
-		)
-		for kI := 0; kI < k; kI++ {
-			dir := directions[kI]
-			temp := uint8(temperatures[kI])
-
-			if false == checkBoundary(temp, temperatureBoundaryMin, temperatureBoundaryMax) {
+			if false == checkBoundary(temp, tempBoundaryMin, tempBoundaryMax) {
 				fmt.Println("Invalid: temp not in boundary")
 				return
 			}
-			switch dir {
+
+			switch direction {
 			case MoreOrEqual:
 				maxBottom = max(maxBottom, temp)
 			case LessOrEqual:
 				minTop = min(minTop, temp)
 			} // either one of them will be called, I controlled for  that
 
+			var result int = 0
+			if maxBottom > minTop {
+				result = defaultResult
+			} else {
+				result = int(maxBottom)
+			}
+			fmt.Println(result)
 		}
-
-		var result int = 0
-		if minTop > maxBottom {
-			result = defaultResult
-		} else {
-			result = int(minTop)
-		}
-		fmt.Println(result)
+	
 	}
 
 }
