@@ -11,6 +11,14 @@ const (
 	MoreOrEqual = iota
 	LessOrEqual
 )
+const defaultResult = -1
+const (
+	temperatureBoundaryMax = 30
+	temperatureBoundaryMin = 15
+
+	nLimitation = 1000
+	kLimitation = 1000
+)
 
 func parseOp(input string) (Direction, error) {
 	var dir Direction
@@ -25,16 +33,11 @@ func parseOp(input string) (Direction, error) {
 	}
 	return dir, nil
 }
+func checkBoundary(n uint8, low uint8, high uint8) bool {
+	return n >= low && n <= high
+}
 
 func main() {
-	const defaultResult = -1
-	const (
-		temperatureBoundaryMax = 30
-		temperatureBoundaryMin = 15
-
-		nLimitation = 1000
-		kLimitation = 1000
-	)
 
 	var (
 		n int
@@ -81,5 +84,34 @@ func main() {
 			temperatures = append(temperatures, temperature)
 		}
 
+		var (
+			maxBottom uint8 = 15
+			minTop    uint8 = 30
+		)
+		for kI := 0; kI < k; kI++ {
+			dir := directions[kI]
+			temp := uint8(temperatures[kI])
+
+			if false == checkBoundary(temp, temperatureBoundaryMin, temperatureBoundaryMax) {
+				fmt.Println("Invalid: temp not in boundary")
+				return
+			}
+			switch dir {
+			case MoreOrEqual:
+				maxBottom = max(maxBottom, temp)
+			case LessOrEqual:
+				minTop = min(minTop, temp)
+			} // either one of them will be called, I controlled for  that
+
+		}
+
+		var result int = 0
+		if minTop > maxBottom {
+			result = defaultResult
+		} else {
+			result = int(minTop)
+		}
+		fmt.Println(result)
 	}
+
 }
