@@ -12,11 +12,16 @@ func f(bolshemenshe string, now int, add int) int {
       return now
     }
   } else {
-    fmt.Println("Gopher the best mascot")
+    if (now < add) {
+      return now
+    } else {
+      return add
+    }
   }
 }
 
 func main() {
   var N int
   var Kolichestvo int
+
 }
