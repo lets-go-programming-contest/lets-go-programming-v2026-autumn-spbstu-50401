@@ -46,8 +46,18 @@ func main() {
           r = add
           l = 15
         }
+      } else {
+        if (ismore(bolshemenshe)) {
+          if (add > l) {
+            l = add
+          }
+        } else {
+          if (add < r) {
+            r = add
+          }
+        }
       }
+      printt(l, r)
     }
   }
-  fmt.Println("Gopher", l, r)
 }
