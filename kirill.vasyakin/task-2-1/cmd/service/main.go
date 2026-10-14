@@ -17,5 +17,18 @@ func main() {
 			fmt.Println("Ошибка чтения")
 			return
 		}
+
+		low, high := 15, 30
+
+		for j := 0; j < K; j++ {
+			var operation string
+			var T int
+
+			_, err := fmt.Scan(&operation, &T)
+			if err != nil {
+				fmt.Println("Ошибка чтения")
+				return
+			}
+		}
 	}
 }
