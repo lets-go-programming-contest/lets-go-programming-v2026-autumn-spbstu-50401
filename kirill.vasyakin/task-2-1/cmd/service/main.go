@@ -10,4 +10,12 @@ func main() {
 		fmt.Println("Ошибка чтения")
 		return
 	}
+
+	for i := 0; i < N; i++ {
+		_, err := fmt.Scan(&K)
+		if err != nil {
+			fmt.Println("Ошибка чтения")
+			return
+		}
+	}
 }
