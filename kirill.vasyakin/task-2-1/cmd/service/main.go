@@ -29,6 +29,26 @@ func main() {
 				fmt.Println("Ошибка чтения")
 				return
 			}
+
+			switch operation {
+			case ">=":
+				if T > low {
+					low = T
+				}
+			case "<=":
+				if T < high {
+					high = T
+				}
+			default:
+				fmt.Println("Неизвестная операция: ", operation)
+				return
+			}
+
+			if low <= high {
+				fmt.Println(low)
+			} else {
+				fmt.Println(-1)
+			}
 		}
 	}
 }
