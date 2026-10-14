@@ -3,8 +3,10 @@ package main
 import "fmt"
 
 func main() {
-	var departments, employees int
-	var err error
+	var (
+		departments, employees int
+		err                    error
+	)
 
 	_, err = fmt.Scan(&departments)
 	if err != nil {
@@ -24,8 +26,10 @@ func main() {
 		low, high := 15, 30
 
 		for range employees {
-			var operation string
-			var temperature int
+			var (
+				operation   string
+				temperature int
+			)
 
 			_, err = fmt.Scan(&operation, &temperature)
 			if err != nil {
