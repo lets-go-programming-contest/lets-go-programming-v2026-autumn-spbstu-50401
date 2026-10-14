@@ -3,44 +3,49 @@ package main
 import "fmt"
 
 func main() {
-	var N, K int
+	var departments, employees int
+	var err error
 
-	_, err := fmt.Scan(&N)
+	_, err = fmt.Scan(&departments)
 	if err != nil {
 		fmt.Println("Ошибка чтения")
+
 		return
 	}
 
-	for i := 0; i < N; i++ {
-		_, err := fmt.Scan(&K)
+	for range departments {
+		_, err = fmt.Scan(&employees)
 		if err != nil {
 			fmt.Println("Ошибка чтения")
+
 			return
 		}
 
 		low, high := 15, 30
 
-		for j := 0; j < K; j++ {
+		for range employees {
 			var operation string
-			var T int
+			var temperature int
 
-			_, err := fmt.Scan(&operation, &T)
+			_, err = fmt.Scan(&operation, &temperature)
 			if err != nil {
 				fmt.Println("Ошибка чтения")
+
 				return
 			}
 
 			switch operation {
 			case ">=":
-				if T > low {
-					low = T
+				if temperature > low {
+					low = temperature
 				}
 			case "<=":
-				if T < high {
-					high = T
+				if temperature < high {
+					high = temperature
 				}
 			default:
-				fmt.Println("Неизвестная операция: ", operation)
+				fmt.Println("Неизвестная операция:", operation)
+
 				return
 			}
 
