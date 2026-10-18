@@ -9,17 +9,18 @@ func main() {
 		return
 	}
 
-	var k int
-	if _, err := fmt.Scan(&k); err != nil {
-		fmt.Println("Invalid employee count")
-		return
-	}
-
 	for i := 0; i < n; i++ {
+
+		var k int
+		if _, err := fmt.Scan(&k); err != nil {
+			fmt.Println("Invalid employee count")
+			return
+		}
+
 		var minTemp int = 15
 		var maxTemp int = 30
 
-		for j := 0; j < k; i++ {
+		for j := 0; j < k; j++ {
 			var op string
 			var t int
 
