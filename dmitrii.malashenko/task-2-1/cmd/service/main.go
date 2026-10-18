@@ -3,40 +3,41 @@ package main
 import "fmt"
 
 func main() {
-	var n int
-	if _, err := fmt.Scan(&n); err != nil {
+	var departments int
+	if _, err := fmt.Scan(&departments); err != nil {
 		fmt.Println("Invalid department count")
 		return
 	}
 
-	for i := 0; i < n; i++ {
+	for range departments {
 
-		var k int
-		if _, err := fmt.Scan(&k); err != nil {
+		var employees int
+		if _, err := fmt.Scan(&employees); err != nil {
 			fmt.Println("Invalid employee count")
 			return
 		}
 
-		var minTemp int = 15
-		var maxTemp int = 30
+		minTemp := 15
+		maxTemp := 30
 
-		for j := 0; j < k; j++ {
-			var op string
-			var t int
+		for range employees {
+			var operator string
+			var temperature int
 
-			if _, err := fmt.Scan(&op, &t); err != nil {
+			if _, err := fmt.Scan(&operator, &temperature); err != nil {
 				fmt.Println("Invalid input temperature data")
+
 				return
 			}
 
-			switch op {
+			switch operator {
 			case ">=":
-				if t > minTemp {
-					minTemp = t
+				if temperature > minTemp {
+					minTemp = temperature
 				}
 			case "<=":
-				if t < maxTemp {
-					maxTemp = t
+				if temperature < maxTemp {
+					maxTemp = temperature
 				}
 			default:
 				fmt.Println("Incorrect input data")
