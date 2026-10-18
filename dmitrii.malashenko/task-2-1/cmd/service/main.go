@@ -28,7 +28,26 @@ func main() {
 				return
 			}
 
-		}
+			switch op {
+			case ">=":
+				if t > minTemp {
+					minTemp = t
+				}
+			case "<=":
+				if t < maxTemp {
+					maxTemp = t
+				}
+			default:
+				fmt.Println("Incorrect input data")
 
+				return
+			}
+
+			if minTemp <= maxTemp {
+				fmt.Println(minTemp)
+			} else {
+				fmt.Println(-1)
+			}
+		}
 	}
 }
