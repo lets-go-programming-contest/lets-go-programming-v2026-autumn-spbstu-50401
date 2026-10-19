@@ -5,16 +5,14 @@ import "fmt"
 func main() {
 	var departments int
 	if _, err := fmt.Scan(&departments); err != nil {
-		fmt.Println("Invalid department count")
-
+		fmt.Println(err)
 		return
 	}
 
 	for range departments {
 		var employees int
 		if _, err := fmt.Scan(&employees); err != nil {
-			fmt.Println("Invalid employee count")
-
+			fmt.Println(err)
 			return
 		}
 
@@ -28,7 +26,7 @@ func main() {
 			)
 
 			if _, err := fmt.Scan(&operator, &temperature); err != nil {
-				fmt.Println("Invalid input temperature data")
+				fmt.Println(err)
 
 				return
 			}
