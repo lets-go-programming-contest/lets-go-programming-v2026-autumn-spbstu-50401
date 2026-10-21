@@ -1,17 +1,22 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 )
+
+var errUnknownOperation = errors.New("unknown operation")
 
 func processDepartment(employees int) error {
 	tMax := 30
 	tMin := 15
 
 	for range employees {
-		var operation string
-		var value int
+		var (
+			operation string
+			value     int
+		)
 
 		_, err := fmt.Scan(&operation, &value)
 		if err != nil {
@@ -28,7 +33,7 @@ func processDepartment(employees int) error {
 				tMin = value
 			}
 		default:
-			return fmt.Errorf("unknown operation: %s", operation)
+			return fmt.Errorf("%w: %s", errUnknownOperation, operation)
 		}
 
 		if tMin <= tMax {
