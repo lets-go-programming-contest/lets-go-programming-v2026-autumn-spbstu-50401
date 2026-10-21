@@ -5,57 +5,74 @@ import (
 	"os"
 )
 
+func processDepartment(employees int) error {
+	tMax := 30
+	tMin := 15
+
+	for range employees {
+		var operation string
+		var value int
+
+		_, err := fmt.Scan(&operation, &value)
+		if err != nil {
+			return fmt.Errorf("reading operation: %w", err)
+		}
+
+		switch operation {
+		case "<=":
+			if tMax > value {
+				tMax = value
+			}
+		case ">=":
+			if tMin < value {
+				tMin = value
+			}
+		default:
+			return fmt.Errorf("unknown operation: %s", operation)
+		}
+
+		if tMin <= tMax {
+			fmt.Println(tMin)
+		} else {
+			fmt.Println(-1)
+		}
+	}
+
+	return nil
+}
+
 func main() {
-	var n int
-	_, err := fmt.Scan(&n)
+	var departments int
+
+	_, err := fmt.Scan(&departments)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "reading number of departments:", err)
 		os.Exit(1)
 	}
-	if n <= 0 {
-		fmt.Fprintln(os.Stderr, "invalid number of departments:", n)
+
+	if departments <= 0 {
+		fmt.Fprintln(os.Stderr, "invalid number of departments:", departments)
 		os.Exit(1)
 	}
-	for i := 0; i < n; i++ {
-		var k int
-		_, err = fmt.Scan(&k)
+
+	for range departments {
+		var employees int
+
+		_, err = fmt.Scan(&employees)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "reading number of employees:", err)
 			os.Exit(1)
 		}
-		if k <= 0 {
-			fmt.Fprintln(os.Stderr, "invalid number of employees:", k)
+
+		if employees <= 0 {
+			fmt.Fprintln(os.Stderr, "invalid number of employees:", employees)
 			os.Exit(1)
 		}
-		var tMax = 30
-		var tMin = 15
-		for j := 0; j < k; j++ {
-			var op string
-			var v int
-			_, err = fmt.Scan(&op, &v)
-			if err != nil {
-				fmt.Fprintln(os.Stderr, "reading operation:", err)
-				os.Exit(1)
-			}
-			switch op {
-			case "<=":
-				if tMax > v {
-					tMax = v
-				}
-			case ">=":
-				if tMin < v {
-					tMin = v
-				}
-			default:
-				fmt.Fprintln(os.Stderr, "unknown operation:", op)
-				os.Exit(1)
-			}
 
-			if tMin <= tMax {
-				fmt.Println(tMin)
-			} else {
-				fmt.Println(-1)
-			}
+		err = processDepartment(employees)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
 		}
 	}
 }
