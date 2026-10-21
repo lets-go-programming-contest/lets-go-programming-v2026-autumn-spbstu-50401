@@ -12,6 +12,7 @@ func main() {
 
 	if _, err := fmt.Scan(&departments); err != nil {
 		fmt.Println(err)
+
 		return
 	}
 
@@ -20,6 +21,7 @@ func main() {
 
 		if _, err := fmt.Scan(&employees); err != nil {
 			fmt.Println(err)
+
 			return
 		}
 
@@ -33,6 +35,7 @@ func main() {
 
 			if _, err := fmt.Scan(&sign, &temp); err != nil {
 				fmt.Println(err)
+
 				return
 			}
 
@@ -47,6 +50,7 @@ func main() {
 				}
 			default:
 				fmt.Println("invalid sign:", sign)
+
 				return
 			}
 
