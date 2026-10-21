@@ -3,22 +3,19 @@ package main
 import "fmt"
 
 func main() {
-	var (
-		departments, employees int
-		err                    error
-	)
+	var departments, employees int
 
-	_, err = fmt.Scan(&departments)
+	_, err := fmt.Scan(&departments)
 	if err != nil {
-		fmt.Println("Ошибка чтения")
+		fmt.Println("Read error:", err)
 
 		return
 	}
 
 	for range departments {
-		_, err = fmt.Scan(&employees)
+		_, err := fmt.Scan(&employees)
 		if err != nil {
-			fmt.Println("Ошибка чтения")
+			fmt.Println("Read error:", err)
 
 			return
 		}
@@ -31,9 +28,9 @@ func main() {
 				temperature int
 			)
 
-			_, err = fmt.Scan(&operation, &temperature)
+			_, err := fmt.Scan(&operation, &temperature)
 			if err != nil {
-				fmt.Println("Ошибка чтения")
+				fmt.Println("Read error:", err)
 
 				return
 			}
@@ -48,7 +45,7 @@ func main() {
 					high = temperature
 				}
 			default:
-				fmt.Println("Неизвестная операция:", operation)
+				fmt.Println("Unknown operation:", operation)
 
 				return
 			}

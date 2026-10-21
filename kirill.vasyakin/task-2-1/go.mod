@@ -1,3 +1,3 @@
-module github.com/potomnazovy/task-1
+module github.com/potomnazovy/task-2-1
 
 go 1.22.7
