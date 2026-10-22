@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 )
 
@@ -21,7 +20,6 @@ const (
 	kLimitation = 1000
 )
 
-var ErrInvalidOperator = errors.New("invalid operator")
 
 func parseOp(input string) (Direction, error) {
 	var dir Direction
@@ -32,7 +30,7 @@ func parseOp(input string) (Direction, error) {
 	case "<=":
 		dir = LessOrEqual
 	default:
-		return 0, ErrInvalidOperator
+		return 0, fmt.Errorf("bad operation: expected <= or >=, got %s", input)
 	}
 
 	return dir, nil
@@ -53,31 +51,23 @@ func processQueries(workerCount int) error {
 
 		_, err := fmt.Scan(&operation)
 		if err != nil {
-			fmt.Println("Invalid operation input")
-
-			return ErrInvalidOperator
+			return fmt.Errorf("reading operation: %w", err)
 		}
 
 		direction, err := parseOp(operation)
 		if err != nil {
-			fmt.Println("Invalid operation input parsing")
-
-			return ErrInvalidOperator
+			return err
 		}
 
 		var temp uint8
 
 		_, err = fmt.Scan(&temp)
 		if err != nil {
-			fmt.Println("Invalid temperature input")
-
-			return ErrInvalidOperator
+			return fmt.Errorf("invalid temperature input: %d", temp)
 		}
 
 		if !checkBoundary(temp, tempBoundaryMin, tempBoundaryMax) {
-			fmt.Println("Invalid: temp not in boundary")
-
-			return ErrInvalidOperator
+			return fmt.Errorf("temparature is valid but doesn't fit the boundaries: %d", temp)
 		}
 
 		switch direction {
@@ -85,7 +75,7 @@ func processQueries(workerCount int) error {
 			maxBottom = max(maxBottom, temp)
 		case LessOrEqual:
 			minTop = min(minTop, temp)
-		} // either one of them will be called, I controlled for  that
+		}
 
 		var result int
 
@@ -109,7 +99,7 @@ func main() {
 
 	_, err := fmt.Scan(&departmentCount)
 	if err != nil || departmentCount > nLimitation {
-		fmt.Println("Invalin N parameter")
+		fmt.Println("invalid N parameter")
 
 		return
 	}
@@ -117,7 +107,7 @@ func main() {
 	for range departmentCount {
 		_, err := fmt.Scan(&workerCount)
 		if err != nil || workerCount > kLimitation {
-			fmt.Println("Invalid K parameter")
+			fmt.Println("invalid K parameter")
 
 			return
 		}
