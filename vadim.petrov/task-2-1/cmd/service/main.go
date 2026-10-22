@@ -42,7 +42,7 @@ func main() {
 					topLine = numTemperature
 				}
 			default:
-				fmt.Println("Invalid operator")
+				fmt.Println("Invalid operator.")
 
 				return
 			}
