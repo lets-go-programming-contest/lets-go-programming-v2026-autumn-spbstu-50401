@@ -42,7 +42,7 @@ func checkBoundary(n uint8, low uint8, high uint8) bool {
 	return n >= low && n <= high
 }
 
-func proccessQueries(workerCount int) error {
+func processQueries(workerCount int) error {
 	var (
 		maxBottom uint8 = tempBoundaryMin
 		minTop    uint8 = tempBoundaryMax
@@ -122,7 +122,7 @@ func main() {
 			return
 		}
 
-		err = proccessQueries(workerCount)
+		err = processQueries(workerCount)
 		if err != nil {
 			fmt.Println(err.Error())
 
