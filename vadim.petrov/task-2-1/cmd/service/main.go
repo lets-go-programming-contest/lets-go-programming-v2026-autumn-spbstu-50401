@@ -3,18 +3,18 @@ package main
 import "fmt"
 
 func main() {
-	var departatmentsCount int
+	var departmentsCount int
 
-	if _, err := fmt.Scanln(&departatmentsCount); err != nil {
+	if _, err := fmt.Scan(&departmentsCount); err != nil {
 		fmt.Println("Invalid read count of departaments(", err, ")")
 
 		return
 	}
 
-	for range departatmentsCount {
+	for range departmentsCount {
 		var peopleCount int
 
-		if _, err := fmt.Scanln(&peopleCount); err != nil {
+		if _, err := fmt.Scan(&peopleCount); err != nil {
 			fmt.Println("Invalid read count of people(", err, ")")
 
 			return
@@ -25,7 +25,7 @@ func main() {
 		for range peopleCount {
 			var operator string
 
-			if _, err := fmt.Scanln(&operator); err != nil {
+			if _, err := fmt.Scan(&operator); err != nil {
 				fmt.Println("Invalid read count of operator(", err, ")")
 
 				return
@@ -33,7 +33,7 @@ func main() {
 
 			var numTemperature int
 
-			if _, err := fmt.Scanln(&numTemperature); err != nil {
+			if _, err := fmt.Scan(&numTemperature); err != nil {
 				fmt.Println("Invalid read count of temperature(", err, ")")
 
 				return
