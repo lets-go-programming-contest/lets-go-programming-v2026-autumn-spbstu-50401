@@ -41,9 +41,13 @@ func main() {
 
 			switch operator {
 			case ">=":
-				downLine = numTemperature
+				if numTemperature > downLine {
+					downLine = numTemperature
+				}
 			case "<=":
-				topLine = numTemperature
+				if numTemperature < topLine {
+					topLine = numTemperature
+				}
 			default:
 				fmt.Println("Invalid operator")
 
