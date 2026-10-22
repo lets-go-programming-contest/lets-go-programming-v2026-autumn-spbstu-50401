@@ -24,17 +24,10 @@ func main() {
 
 		for range peopleCount {
 			var operator string
-
-			if _, err := fmt.Scan(&operator); err != nil {
-				fmt.Println("Invalid read count of operator(", err, ")")
-
-				return
-			}
-
 			var numTemperature int
 
-			if _, err := fmt.Scan(&numTemperature); err != nil {
-				fmt.Println("Invalid read count of temperature(", err, ")")
+			if _, err := fmt.Scan(&numTemperature, &numTemperature); err != nil {
+				fmt.Println("Invalid read operator or temperature(", err, ")")
 
 				return
 			}
