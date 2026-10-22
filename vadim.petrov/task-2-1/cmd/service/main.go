@@ -44,6 +44,12 @@ func main() {
 				fmt.Println("Invalid operator")
 				return
 			}
+
+			if topLine > downLine {
+				fmt.Println(downLine)
+			} else {
+				fmt.Println(-1)
+			}
 		}
 
 	}
