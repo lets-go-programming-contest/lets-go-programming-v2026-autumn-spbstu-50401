@@ -50,7 +50,7 @@ func main() {
 				return
 			}
 
-			if topLine > downLine {
+			if topLine >= downLine {
 				fmt.Println(downLine)
 			} else {
 				fmt.Println(-1)
