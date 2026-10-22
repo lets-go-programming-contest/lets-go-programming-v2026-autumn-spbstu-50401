@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -20,6 +21,11 @@ const (
 	kLimitation = 1000
 )
 
+var (
+	ErrBadOperation           = errors.New("bad operation: expected <= or >=")
+	ErrInvalidTemperature     = errors.New("invalid temperature input")
+	ErrTemperatureOutOfBounds = errors.New("temperature is valid but doesn't fit the boundaries")
+)
 
 func parseOp(input string) (Direction, error) {
 	var dir Direction
@@ -30,7 +36,7 @@ func parseOp(input string) (Direction, error) {
 	case "<=":
 		dir = LessOrEqual
 	default:
-		return 0, fmt.Errorf("bad operation: expected <= or >=, got %s", input)
+		return 0, fmt.Errorf("%w, got %s", ErrBadOperation, input)
 	}
 
 	return dir, nil
@@ -59,22 +65,22 @@ func processQueries(workerCount int) error {
 			return err
 		}
 
-		var temp uint8
+		var temperature uint8
 
-		_, err = fmt.Scan(&temp)
+		_, err = fmt.Scan(&temperature)
 		if err != nil {
-			return fmt.Errorf("invalid temperature input: %d", temp)
+			return fmt.Errorf("%w: %d", ErrInvalidTemperature, temperature)
 		}
 
-		if !checkBoundary(temp, tempBoundaryMin, tempBoundaryMax) {
-			return fmt.Errorf("temparature is valid but doesn't fit the boundaries: %d", temp)
+		if !checkBoundary(temperature, tempBoundaryMin, tempBoundaryMax) {
+			return fmt.Errorf("%w: %d", ErrTemperatureOutOfBounds, temperature)
 		}
 
 		switch direction {
 		case MoreOrEqual:
-			maxBottom = max(maxBottom, temp)
+			maxBottom = max(maxBottom, temperature)
 		case LessOrEqual:
-			minTop = min(minTop, temp)
+			minTop = min(minTop, temperature)
 		}
 
 		var result int
