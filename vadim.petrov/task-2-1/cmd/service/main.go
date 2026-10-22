@@ -20,7 +20,7 @@ func main() {
 			return
 		}
 
-		var downLine, topLine int = 15, 30
+		downLine, topLine := 15, 30
 
 		for range peopleCount {
 			var operator string
