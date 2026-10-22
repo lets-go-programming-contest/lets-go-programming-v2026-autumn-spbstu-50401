@@ -23,10 +23,9 @@ func main() {
 		downLine, topLine := 15, 30
 
 		for range peopleCount {
-			var (
-				operator       string
-				numTemperature int
-			)
+			var operator string
+
+			var numTemperature int
 
 			if _, err := fmt.Scan(&numTemperature, &numTemperature); err != nil {
 				fmt.Println("Invalid read operator or temperature(", err, ")")
