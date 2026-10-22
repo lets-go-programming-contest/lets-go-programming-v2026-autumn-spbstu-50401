@@ -27,7 +27,7 @@ func main() {
 
 			var numTemperature int
 
-			if _, err := fmt.Scan(&numTemperature, &numTemperature); err != nil {
+			if _, err := fmt.Scan(&operator, &numTemperature); err != nil {
 				fmt.Println("Invalid read operator or temperature(", err, ")")
 
 				return
