@@ -34,6 +34,16 @@ func main() {
 				fmt.Println("Invalid read count of temperature(", err, ")")
 				return
 			}
+
+			switch operator {
+			case ">=":
+				downLine = numTemperature
+			case "<=":
+				topLine = numTemperature
+			default:
+				fmt.Println("Invalid operator")
+				return
+			}
 		}
 
 	}
