@@ -8,9 +8,10 @@ import (
 type Direction uint8
 
 const (
-	MoreOrEqual = iota
+	MoreOrEqual Direction = iota
 	LessOrEqual
 )
+
 const defaultResult = -1
 const (
 	tempBoundaryMax = 30
