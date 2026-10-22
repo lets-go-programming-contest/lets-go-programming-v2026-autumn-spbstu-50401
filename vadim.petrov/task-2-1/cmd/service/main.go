@@ -7,6 +7,7 @@ func main() {
 
 	if _, err := fmt.Scanln(&departatmentsCount); err != nil {
 		fmt.Println("Invalid read count of departaments(", err, ")")
+
 		return
 	}
 
@@ -15,6 +16,7 @@ func main() {
 
 		if _, err := fmt.Scanln(&peopleCount); err != nil {
 			fmt.Println("Invalid read count of people(", err, ")")
+
 			return
 		}
 
@@ -25,6 +27,7 @@ func main() {
 
 			if _, err := fmt.Scanln(&operator); err != nil {
 				fmt.Println("Invalid read count of operator(", err, ")")
+
 				return
 			}
 
@@ -32,6 +35,7 @@ func main() {
 
 			if _, err := fmt.Scanln(&numTemperature); err != nil {
 				fmt.Println("Invalid read count of temperature(", err, ")")
+
 				return
 			}
 
@@ -42,6 +46,7 @@ func main() {
 				topLine = numTemperature
 			default:
 				fmt.Println("Invalid operator")
+
 				return
 			}
 
@@ -51,6 +56,5 @@ func main() {
 				fmt.Println(-1)
 			}
 		}
-
 	}
 }
