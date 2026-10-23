@@ -46,7 +46,7 @@ func main() {
 
 	_, err := fmt.Scan(&numberOfDishes)
 	if err != nil {
-		fmt.Println("Invalid first operand")
+		fmt.Println("Invalid first operand: %w", err)
 
 		return
 	}
@@ -57,7 +57,7 @@ func main() {
 	for range numberOfDishes {
 		_, err := fmt.Scan(&dishRating)
 		if err != nil {
-			fmt.Println("Invalid first operand")
+			fmt.Println("Couldn't get the rating: %w", err)
 
 			return
 		}
@@ -67,7 +67,7 @@ func main() {
 
 	_, err = fmt.Scan(&ratingChoice)
 	if err != nil {
-		fmt.Println("Invalid first operand")
+		fmt.Println("Invalid rating choice %w", err)
 
 		return
 	}
