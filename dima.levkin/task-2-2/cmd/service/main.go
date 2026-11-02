@@ -39,14 +39,14 @@ func (h *IntHeap) Pop() any {
 
 func main() {
 	var (
-		numberOfDishes = 0
-		dishRating     = 0
-		ratingChoice   = 0
+		numberOfDishes int
+		dishRating     int
+		ratingChoice   int
 	)
 
 	_, err := fmt.Scan(&numberOfDishes)
 	if err != nil {
-		fmt.Println("Invalid first operand: %w", err)
+		fmt.Printf("failed to scan number of dishes: %v\n", err)
 
 		return
 	}
@@ -57,7 +57,7 @@ func main() {
 	for range numberOfDishes {
 		_, err := fmt.Scan(&dishRating)
 		if err != nil {
-			fmt.Println("Couldn't get the rating: %w", err)
+			fmt.Printf("failed to scan dish rating: %v\n", err)
 
 			return
 		}
@@ -67,7 +67,13 @@ func main() {
 
 	_, err = fmt.Scan(&ratingChoice)
 	if err != nil {
-		fmt.Println("Invalid rating choice %w", err)
+		fmt.Printf("failed to scan rating choice: %v\n", err)
+
+		return
+	}
+
+	if ratingChoice <= 0 || ratingChoice > numberOfDishes {
+		fmt.Printf("invalid rating choice: must be between 1 and %d\n", numberOfDishes)
 
 		return
 	}
