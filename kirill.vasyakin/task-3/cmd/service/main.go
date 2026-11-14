@@ -108,19 +108,10 @@ func parseXML(path string) []CurrencyJSON {
 	result := make([]CurrencyJSON, 0, len(valCurs.Items))
 
 	for _, item := range valCurs.Items {
-		code := 0
-		numCodeStr := strings.TrimSpace(item.NumCode)
-
-		if numCodeStr != "" {
-			_, err := strconv.Atoi(numCodeStr)
-			if err != nil {
-				panic("Invalid NumCode format: " + item.NumCode)
-			}
-		}
+		code := parseNumCode(item.NumCode)
 
 		valStr := strings.ReplaceAll(strings.TrimSpace(item.Value), ",", ".")
 		val, err := strconv.ParseFloat(valStr, 64)
-
 		if err != nil {
 			panic("Invalid Value format: " + item.Value)
 		}
@@ -150,4 +141,18 @@ func saveJSON(path string, data []CurrencyJSON) {
 	if err != nil {
 		panic("Failed to write output file: " + err.Error())
 	}
+}
+
+func parseNumCode(numCode string) int {
+	str := strings.TrimSpace(numCode)
+	if str == "" {
+		return 0
+	}
+
+	code, err := strconv.Atoi(str)
+	if err != nil {
+		panic("Invalid NumCode format: " + numCode)
+	}
+
+	return code
 }
