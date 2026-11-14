@@ -17,8 +17,8 @@ import (
 )
 
 const (
-	dirPermissions  = 0755
-	filePermissions = 0644
+	dirPermissions  = 0o755
+	filePermissions = 0o644
 	xmlEncoding     = "windows-1251"
 	jsonIndent      = "    "
 )
@@ -92,6 +92,7 @@ func parseXML(path string) []CurrencyJSON {
 		if charset == xmlEncoding {
 			return charmap.Windows1251.NewDecoder().Reader(input), nil
 		}
+
 		return input, nil
 	}
 
@@ -101,7 +102,7 @@ func parseXML(path string) []CurrencyJSON {
 		panic("Failed to parse XML: " + err.Error())
 	}
 
-	var result []CurrencyJSON
+	result := make([]CurrencyJSON, 0, len(valCurs.Items))
 	for _, item := range valCurs.Items {
 		code := 0
 		numCodeStr := strings.TrimSpace(item.NumCode)
@@ -109,7 +110,6 @@ func parseXML(path string) []CurrencyJSON {
 		if numCodeStr != "" {
 			var err error
 			code, err = strconv.Atoi(numCodeStr)
-
 			if err != nil {
 				panic("Invalid NumCode format: " + item.NumCode)
 			}
