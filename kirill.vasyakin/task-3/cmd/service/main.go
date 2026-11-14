@@ -1,9 +1,16 @@
 package main
 
 import (
+	"encoding/xml"
 	"flag"
 	"fmt"
+	"io"
 	"os"
+	"strconv"
+	"strings"
+
+	"golang.org/x/text/encoding/charmap"
+	"gopkg.in/yaml.v3"
 )
 
 type Config struct {
@@ -37,6 +44,9 @@ func main() {
 
 	config := readConfig(*configPath)
 	fmt.Println("Config loaded successfully")
+
+	currencies := parseXML(config.InputFile)
+	fmt.Printf("Parsed %d currencies\n", len(currencies))
 }
 
 func readConfig(path string) Config {
@@ -52,4 +62,44 @@ func readConfig(path string) Config {
 	}
 
 	return cfg
+}
+
+func parseXML(path string) []CurrencyJSON {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		panic("Failed to read XML file: " + err.Error())
+	}
+
+	decoder := xml.NewDecoder(strings.NewReader(string(data)))
+	decoder.CharsetReader = func(charset string, input io.Reader) (io.Reader, error) {
+		if charset == "windows-1251" {
+			return charmap.Windows1251.NewDecoder().Reader(input), nil
+		}
+		return input, nil
+	}
+
+	var valCurs ValCurs
+	err = decoder.Decode(&valCurs)
+	if err != nil {
+		panic("Failed to parse XML: " + err.Error())
+	}
+
+	var result []CurrencyJSON
+	for _, item := range valCurs.Items {
+		code, _ := strconv.Atoi(strings.TrimSpace(item.NumCode))
+
+		valStr := strings.ReplaceAll(strings.TrimSpace(item.Value), ",", ".")
+		val, err := strconv.ParseFloat(valStr, 64)
+		if err != nil {
+			panic("Invalid Value format: " + item.Value)
+		}
+
+		result = append(result, CurrencyJSON{
+			NumCode:  code,
+			CharCode: item.CharCode,
+			Value:    val,
+		})
+	}
+
+	return result
 }
