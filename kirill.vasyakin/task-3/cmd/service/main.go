@@ -74,6 +74,7 @@ func readConfig(path string) Config {
 	}
 
 	var cfg Config
+
 	err = yaml.Unmarshal(data, &cfg)
 	if err != nil {
 		panic("Failed to parse YAML config: " + err.Error())
@@ -98,6 +99,7 @@ func parseXML(path string) []CurrencyJSON {
 	}
 
 	var valCurs ValCurs
+
 	err = decoder.Decode(&valCurs)
 	if err != nil {
 		panic("Failed to parse XML: " + err.Error())
@@ -110,8 +112,7 @@ func parseXML(path string) []CurrencyJSON {
 		numCodeStr := strings.TrimSpace(item.NumCode)
 
 		if numCodeStr != "" {
-			var err error
-			code, err = strconv.Atoi(numCodeStr)
+			_, err := strconv.Atoi(numCodeStr)
 			if err != nil {
 				panic("Invalid NumCode format: " + item.NumCode)
 			}
