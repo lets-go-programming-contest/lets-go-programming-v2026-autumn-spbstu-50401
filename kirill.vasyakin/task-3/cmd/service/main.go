@@ -53,6 +53,7 @@ func main() {
 	}
 
 	config := readConfig(*configPath)
+
 	fmt.Println("Config loaded successfully")
 
 	currencies := parseXML(config.InputFile)
@@ -103,6 +104,7 @@ func parseXML(path string) []CurrencyJSON {
 	}
 
 	result := make([]CurrencyJSON, 0, len(valCurs.Items))
+
 	for _, item := range valCurs.Items {
 		code := 0
 		numCodeStr := strings.TrimSpace(item.NumCode)
@@ -117,6 +119,7 @@ func parseXML(path string) []CurrencyJSON {
 
 		valStr := strings.ReplaceAll(strings.TrimSpace(item.Value), ",", ".")
 		val, err := strconv.ParseFloat(valStr, 64)
+
 		if err != nil {
 			panic("Invalid Value format: " + item.Value)
 		}
