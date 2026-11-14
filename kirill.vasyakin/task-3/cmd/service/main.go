@@ -111,6 +111,7 @@ func parseXML(path string) []CurrencyJSON {
 		code := parseNumCode(item.NumCode)
 
 		valStr := strings.ReplaceAll(strings.TrimSpace(item.Value), ",", ".")
+
 		val, err := strconv.ParseFloat(valStr, 64)
 		if err != nil {
 			panic("Invalid Value format: " + item.Value)
