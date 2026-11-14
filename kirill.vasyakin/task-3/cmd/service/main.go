@@ -103,9 +103,16 @@ func parseXML(path string) []CurrencyJSON {
 
 	var result []CurrencyJSON
 	for _, item := range valCurs.Items {
-		code, err := strconv.Atoi(strings.TrimSpace(item.NumCode))
-		if err != nil {
-			panic("Invalid NumCode format: " + item.NumCode)
+		code := 0
+		numCodeStr := strings.TrimSpace(item.NumCode)
+
+		if numCodeStr != "" {
+			var err error
+			code, err = strconv.Atoi(numCodeStr)
+
+			if err != nil {
+				panic("Invalid NumCode format: " + item.NumCode)
+			}
 		}
 
 		valStr := strings.ReplaceAll(strings.TrimSpace(item.Value), ",", ".")
