@@ -1,6 +1,10 @@
 package main
 
-import "os"
+import (
+	"flag"
+	"fmt"
+	"os"
+)
 
 type Config struct {
 	InputFile  string `yaml:"input-file"`
@@ -21,6 +25,18 @@ type CurrencyJSON struct {
 	NumCode  int     `json:"num_code"`
 	CharCode string  `json:"char_code"`
 	Value    float64 `json:"value"`
+}
+
+func main() {
+	configPath := flag.String("config", "", "Path to YAML config file")
+	flag.Parse()
+
+	if *configPath == "" {
+		panic("The -config flag is required")
+	}
+
+	config := readConfig(*configPath)
+	fmt.Println("Config loaded successfully")
 }
 
 func readConfig(path string) Config {
