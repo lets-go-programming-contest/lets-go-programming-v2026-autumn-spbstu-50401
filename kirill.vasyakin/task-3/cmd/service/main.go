@@ -16,6 +16,13 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+const (
+	dirPermissions  = 0755
+	filePermissions = 0644
+	xmlEncoding     = "windows-1251"
+	jsonIndent      = "    "
+)
+
 type Config struct {
 	InputFile  string `yaml:"input-file"`
 	OutputFile string `yaml:"output-file"`
@@ -82,7 +89,7 @@ func parseXML(path string) []CurrencyJSON {
 
 	decoder := xml.NewDecoder(strings.NewReader(string(data)))
 	decoder.CharsetReader = func(charset string, input io.Reader) (io.Reader, error) {
-		if charset == "windows-1251" {
+		if charset == xmlEncoding {
 			return charmap.Windows1251.NewDecoder().Reader(input), nil
 		}
 		return input, nil
@@ -96,7 +103,10 @@ func parseXML(path string) []CurrencyJSON {
 
 	var result []CurrencyJSON
 	for _, item := range valCurs.Items {
-		code, _ := strconv.Atoi(strings.TrimSpace(item.NumCode))
+		code, err := strconv.Atoi(strings.TrimSpace(item.NumCode))
+		if err != nil {
+			panic("Invalid NumCode format: " + item.NumCode)
+		}
 
 		valStr := strings.ReplaceAll(strings.TrimSpace(item.Value), ",", ".")
 		val, err := strconv.ParseFloat(valStr, 64)
@@ -115,17 +125,17 @@ func parseXML(path string) []CurrencyJSON {
 }
 
 func saveJSON(path string, data []CurrencyJSON) {
-	jsonData, err := json.MarshalIndent(data, "", "    ")
+	jsonData, err := json.MarshalIndent(data, "", jsonIndent)
 	if err != nil {
 		panic("Failed to serialize JSON: " + err.Error())
 	}
 
 	dir := filepath.Dir(path)
-	if err := os.MkdirAll(dir, 0755); err != nil {
+	if err := os.MkdirAll(dir, dirPermissions); err != nil {
 		panic("Failed to create output directory: " + err.Error())
 	}
 
-	err = os.WriteFile(path, jsonData, 0644)
+	err = os.WriteFile(path, jsonData, filePermissions)
 	if err != nil {
 		panic("Failed to write output file: " + err.Error())
 	}
