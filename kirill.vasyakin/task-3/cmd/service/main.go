@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -47,6 +48,10 @@ func main() {
 
 	currencies := parseXML(config.InputFile)
 	fmt.Printf("Parsed %d currencies\n", len(currencies))
+
+	sort.Slice(currencies, func(i, j int) bool {
+		return currencies[i].Value > currencies[j].Value
+	})
 }
 
 func readConfig(path string) Config {
