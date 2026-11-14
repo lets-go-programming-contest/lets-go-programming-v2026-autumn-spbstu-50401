@@ -1,11 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"encoding/xml"
 	"flag"
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -52,6 +54,9 @@ func main() {
 	sort.Slice(currencies, func(i, j int) bool {
 		return currencies[i].Value > currencies[j].Value
 	})
+
+	saveJSON(config.OutputFile, currencies)
+	fmt.Println("Success! Result saved to:", config.OutputFile)
 }
 
 func readConfig(path string) Config {
@@ -107,4 +112,21 @@ func parseXML(path string) []CurrencyJSON {
 	}
 
 	return result
+}
+
+func saveJSON(path string, data []CurrencyJSON) {
+	jsonData, err := json.MarshalIndent(data, "", "    ")
+	if err != nil {
+		panic("Failed to serialize JSON: " + err.Error())
+	}
+
+	dir := filepath.Dir(path)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		panic("Failed to create output directory: " + err.Error())
+	}
+
+	err = os.WriteFile(path, jsonData, 0644)
+	if err != nil {
+		panic("Failed to write output file: " + err.Error())
+	}
 }
