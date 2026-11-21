@@ -2,11 +2,14 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"encoding/xml"
 	"errors"
 	"flag"
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 
 	"github.com/goccy/go-yaml"
 	"golang.org/x/net/html/charset"
@@ -32,6 +35,12 @@ type Courses struct {
 	ValuteList []Valute `xml:"Valute"`
 }
 
+type ResultCurrency struct {
+	NumCode  int `json:"num_code"`
+	CharCode string `json:"char_code"`
+	Value    float64 `json "value"`
+}
+
 func main() {
 	path_ptr := flag.String("config", "", "path to config")
 	flag.Parse()
@@ -55,10 +64,23 @@ func main() {
 	}
 	decoder := xml.NewDecoder(bytes.NewReader(input_file))
 	decoder.CharsetReader = charset.NewReaderLabel
-	var b Courses
-	if err := decoder.Decode(&b);err != nil {
+	var courses Courses
+	if err := decoder.Decode(&courses); err != nil {
 		panic(err)
 	}
-	fmt.Print(b)
 
+	result := make([]ResultCurrency, 0, len(courses.ValuteList))
+	for _, valute := range courses.ValuteList {
+		val_str := strings.ReplaceAll(valute.Value, ",", ".")
+		value, err := strconv.ParseFloat(val_str, 64)
+		if err != nil {
+			panic(err)
+		}
+		result = append(result, ResultCurrency{NumCode: valute.NumCode, CharCode: valute.CharCode, Value: value})
+	}
+	
+	result_str, err := json.Marshal(result)
+	if err != nil {
+		panic(err)
+	}
 }
