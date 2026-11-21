@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"flag"
-	"golang.org/x/net/html/charset"
-	"gopkg.in/yaml.v3"
 	"os"
 	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
+
+	"golang.org/x/net/html/charset"
+	"gopkg.in/yaml.v3"
 )
 
 type Config struct {
@@ -51,9 +52,14 @@ func readXML(path string) ValCurs {
 	if err != nil {
 		panic(err)
 	}
-	defer file.Close()
+	defer func() {
+		if err := file.Close(); err != nil {
+			panic(err)
+		}
+	}()
 
 	var data ValCurs
+
 	decoder := xml.NewDecoder(file)
 	decoder.CharsetReader = charset.NewReaderLabel
 
@@ -75,6 +81,7 @@ func sortCurrencies(data ValCurs) []ResultCurrency {
 
 	for _, currency := range data.Currencies {
 		value := strings.ReplaceAll(currency.Value, ",", ".")
+
 		number, err := strconv.ParseFloat(value, 64)
 		if err != nil {
 			panic(err)
@@ -106,7 +113,7 @@ func saveJSON(path string, currencies []ResultCurrency) {
 		panic(err)
 	}
 
-	if err := os.WriteFile(path, data, 0644); err != nil {
+	if err := os.WriteFile(path, data, 0600); err != nil {
 		panic(err)
 	}
 }
