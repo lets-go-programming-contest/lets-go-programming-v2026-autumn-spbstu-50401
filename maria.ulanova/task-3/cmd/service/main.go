@@ -1,10 +1,11 @@
 package main
 
 import (
+	"encoding/xml"
 	"flag"
-	"os"
-
+	"golang.org/x/net/html/charset"
 	"gopkg.in/yaml.v3"
+	"os"
 )
 
 type Config struct {
@@ -30,6 +31,34 @@ func readConfig(path string) Config {
 	return config
 }
 
+type Currency struct {
+	NumCode  int    `xml:"NumCode"`
+	CharCode string `xml:"CharCode"`
+	Value    string `xml:"Value"`
+}
+
+type ValCurs struct {
+	Currencies []Currency `xml:"Valute"`
+}
+
+func readXML(path string) ValCurs {
+	file, err := os.Open(path)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	var data ValCurs
+	decoder := xml.NewDecoder(file)
+	decoder.CharsetReader = charset.NewReaderLabel
+
+	if err := decoder.Decode(&data); err != nil {
+		panic(err)
+	}
+
+	return data
+}
+
 func main() {
 	configPath := flag.String("config", "", "configuration file path")
 	flag.Parse()
@@ -39,5 +68,6 @@ func main() {
 	}
 
 	config := readConfig(*configPath)
-	_ = config
+	currencies := readXML(config.InputFile)
+	_ = currencies
 }
