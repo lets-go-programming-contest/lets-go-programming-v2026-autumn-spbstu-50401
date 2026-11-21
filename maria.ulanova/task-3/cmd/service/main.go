@@ -52,6 +52,7 @@ func readXML(path string) ValCurs {
 	if err != nil {
 		panic(err)
 	}
+
 	defer func() {
 		if err := file.Close(); err != nil {
 			panic(err)
@@ -104,7 +105,7 @@ func sortCurrencies(data ValCurs) []ResultCurrency {
 func saveJSON(path string, currencies []ResultCurrency) {
 	dir := filepath.Dir(path)
 
-	if err := os.MkdirAll(dir, 0755); err != nil {
+	if err := os.MkdirAll(dir, 0o755); err != nil {
 		panic(err)
 	}
 
@@ -113,7 +114,7 @@ func saveJSON(path string, currencies []ResultCurrency) {
 		panic(err)
 	}
 
-	if err := os.WriteFile(path, data, 0600); err != nil {
+	if err := os.WriteFile(path, data, 0o600); err != nil {
 		panic(err)
 	}
 }
