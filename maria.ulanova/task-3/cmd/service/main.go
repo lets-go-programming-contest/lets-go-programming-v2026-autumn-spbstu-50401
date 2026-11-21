@@ -1,11 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"encoding/xml"
 	"flag"
 	"golang.org/x/net/html/charset"
 	"gopkg.in/yaml.v3"
 	"os"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -92,6 +94,23 @@ func sortCurrencies(data ValCurs) []ResultCurrency {
 	return result
 }
 
+func saveJSON(path string, currencies []ResultCurrency) {
+	dir := filepath.Dir(path)
+
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		panic(err)
+	}
+
+	data, err := json.MarshalIndent(currencies, "", "    ")
+	if err != nil {
+		panic(err)
+	}
+
+	if err := os.WriteFile(path, data, 0644); err != nil {
+		panic(err)
+	}
+}
+
 func main() {
 	configPath := flag.String("config", "", "configuration file path")
 	flag.Parse()
@@ -103,5 +122,5 @@ func main() {
 	config := readConfig(*configPath)
 	currencies := readXML(config.InputFile)
 	result := sortCurrencies(currencies)
-	_ = result
+	saveJSON(config.OutputFile, result)
 }
