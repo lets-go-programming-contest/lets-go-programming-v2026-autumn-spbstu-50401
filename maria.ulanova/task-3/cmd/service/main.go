@@ -6,6 +6,9 @@ import (
 	"golang.org/x/net/html/charset"
 	"gopkg.in/yaml.v3"
 	"os"
+	"sort"
+	"strconv"
+	"strings"
 )
 
 type Config struct {
@@ -59,6 +62,36 @@ func readXML(path string) ValCurs {
 	return data
 }
 
+type ResultCurrency struct {
+	NumCode  int     `json:"num_code"`
+	CharCode string  `json:"char_code"`
+	Value    float64 `json:"value"`
+}
+
+func sortCurrencies(data ValCurs) []ResultCurrency {
+	result := make([]ResultCurrency, 0, len(data.Currencies))
+
+	for _, currency := range data.Currencies {
+		value := strings.ReplaceAll(currency.Value, ",", ".")
+		number, err := strconv.ParseFloat(value, 64)
+		if err != nil {
+			panic(err)
+		}
+
+		result = append(result, ResultCurrency{
+			NumCode:  currency.NumCode,
+			CharCode: currency.CharCode,
+			Value:    number,
+		})
+	}
+
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].Value > result[j].Value
+	})
+
+	return result
+}
+
 func main() {
 	configPath := flag.String("config", "", "configuration file path")
 	flag.Parse()
@@ -69,5 +102,6 @@ func main() {
 
 	config := readConfig(*configPath)
 	currencies := readXML(config.InputFile)
-	_ = currencies
+	result := sortCurrencies(currencies)
+	_ = result
 }
