@@ -42,12 +42,14 @@ func loadConfig(path string) Config {
 	}
 
 	var cfg Config
-	if err := yaml.Unmarshal(data, &cfg); err != nil {
+
+	err = yaml.Unmarshal(data, &cfg)
+	if err != nil {
 		panic(err)
 	}
 
 	if cfg.InputFile == "" || cfg.OutputFile == "" {
-		panic("input-file and output-file must be specified in config")
+		panic("Invalid config: input-file and output-file are required")
 	}
 
 	return cfg
@@ -64,7 +66,9 @@ func loadXML(path string) ValCurs {
 	decoder.CharsetReader = charset.NewReaderLabel
 
 	var valCurs ValCurs
-	if err := decoder.Decode(&valCurs); err != nil {
+
+	err = decoder.Decode(&valCurs)
+	if err != nil {
 		panic(err)
 	}
 
@@ -74,18 +78,20 @@ func loadXML(path string) ValCurs {
 func convertAndSort(valCurs ValCurs) []Currency {
 	currencies := make([]Currency, 0, len(valCurs.Valutes))
 
-	for _, v := range valCurs.Valutes {
-		valueStr := strings.ReplaceAll(v.Value, ",", ".")
-		val, err := strconv.ParseFloat(valueStr, 64)
+	for _, valute := range valCurs.Valutes {
+		valueStr := strings.ReplaceAll(valute.Value, ",", ".")
+
+		parsedValue, err := strconv.ParseFloat(valueStr, 64)
 		if err != nil {
 			panic(err)
 		}
 
-		currencies = append(currencies, Currency{
-			NumCode:  v.NumCode,
-			CharCode: v.CharCode,
-			Value:    val,
-		})
+		var currency Currency
+		currency.NumCode = valute.NumCode
+		currency.CharCode = valute.CharCode
+		currency.Value = parsedValue
+
+		currencies = append(currencies, currency)
 	}
 
 	sort.Slice(currencies, func(i, j int) bool {
@@ -96,30 +102,34 @@ func convertAndSort(valCurs ValCurs) []Currency {
 }
 
 func saveJSON(path string, currencies []Currency) {
-	dir := filepath.Dir(path)
-	if err := os.MkdirAll(dir, 0755); err != nil {
-		panic(err)
-	}
+	outputDir := filepath.Dir(path)
 
-	data, err := json.MarshalIndent(currencies, "", "  ")
+	err := os.MkdirAll(outputDir, 0755)
 	if err != nil {
 		panic(err)
 	}
 
-	if err := os.WriteFile(path, data, 0644); err != nil {
+	jsonData, err := json.MarshalIndent(currencies, "", "  ")
+	if err != nil {
+		panic(err)
+	}
+
+	err = os.WriteFile(path, jsonData, 0644)
+	if err != nil {
 		panic(err)
 	}
 }
 
 func main() {
-	configPath := flag.String("config", "", "path to yaml config file")
+	var configPath string
+	flag.StringVar(&configPath, "config", "", "path to yaml config file")
 	flag.Parse()
 
-	if *configPath == "" {
-		panic("config path is required")
+	if configPath == "" {
+		panic("Config path is required")
 	}
 
-	cfg := loadConfig(*configPath)
+	cfg := loadConfig(configPath)
 	valCurs := loadXML(cfg.InputFile)
 	currencies := convertAndSort(valCurs)
 	saveJSON(cfg.OutputFile, currencies)
