@@ -4,6 +4,9 @@ import (
 	"encoding/xml"
 	"flag"
 	"os"
+	"sort"
+	"strconv"
+	"strings"
 
 	"golang.org/x/net/html/charset"
 	"gopkg.in/yaml.v3"
@@ -22,6 +25,12 @@ type Valute struct {
 	NumCode  int    `xml:"NumCode"`
 	CharCode string `xml:"CharCode"`
 	Value    string `xml:"Value"`
+}
+
+type Currency struct {
+	NumCode  int     `json:"num_code"`
+	CharCode string  `json:"char_code"`
+	Value    float64 `json:"value"`
 }
 
 func loadConfig(path string) Config {
@@ -60,6 +69,30 @@ func loadXML(path string) ValCurs {
 	return valCurs
 }
 
+func convertAndSort(valCurs ValCurs) []Currency {
+	currencies := make([]Currency, 0, len(valCurs.Valutes))
+
+	for _, v := range valCurs.Valutes {
+		valueStr := strings.ReplaceAll(v.Value, ",", ".")
+		val, err := strconv.ParseFloat(valueStr, 64)
+		if err != nil {
+			panic(err)
+		}
+
+		currencies = append(currencies, Currency{
+			NumCode:  v.NumCode,
+			CharCode: v.CharCode,
+			Value:    val,
+		})
+	}
+
+	sort.Slice(currencies, func(i, j int) bool {
+		return currencies[i].Value > currencies[j].Value
+	})
+
+	return currencies
+}
+
 func main() {
 	configPath := flag.String("config", "", "path to yaml config file")
 	flag.Parse()
@@ -69,5 +102,6 @@ func main() {
 	}
 
 	cfg := loadConfig(*configPath)
-	_ = loadXML(cfg.InputFile)
+	valCurs := loadXML(cfg.InputFile)
+	_ = convertAndSort(valCurs)
 }
