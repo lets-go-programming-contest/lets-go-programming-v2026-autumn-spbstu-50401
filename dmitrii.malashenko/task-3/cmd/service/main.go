@@ -99,21 +99,24 @@ func parseValue(s string) (float64, bool) {
 }
 
 func toOutputCurrency(valute Valute) (OutputCurrency, bool) {
-	numCode := strings.TrimSpace(valute.NumCode)
 	charCode := strings.TrimSpace(valute.CharCode)
-
-	if numCode == "" || charCode == "" {
-		return OutputCurrency{}, false
+	if charCode == "" {
+		return OutputCurrency{NumCode: 0, CharCode: "", Value: 0}, false
 	}
 
-	num, err := strconv.Atoi(numCode)
-	if err != nil {
-		return OutputCurrency{}, false
+	numCode := strings.TrimSpace(valute.NumCode)
+	num := 0
+
+	if numCode != "" {
+		parsed, err := strconv.Atoi(numCode)
+		if err == nil {
+			num = parsed
+		}
 	}
 
 	value, ok := parseValue(valute.Value)
 	if !ok {
-		return OutputCurrency{}, false
+		return OutputCurrency{NumCode: 0, CharCode: "", Value: 0}, false
 	}
 
 	return OutputCurrency{
