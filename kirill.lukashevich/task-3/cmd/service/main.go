@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"encoding/xml"
 	"errors"
 	"flag"
@@ -39,6 +40,11 @@ func main() {
 	sort.SliceStable(items, func(i, j int) bool {
 		return items[i].Value > items[j].Value
 	})
+
+	err = saveCurrencies(config.OutputFile, items)
+	if err != nil {
+		panic(err)
+	}
 }
 
 type Config struct {
@@ -118,4 +124,20 @@ func convertCurrencies(currencies []Currency) ([]OutputItem, error) {
 	}
 
 	return items, nil
+}
+
+const filePermissions = 0o600
+
+func saveCurrencies(path string, items []OutputItem) error {
+	data, err := json.MarshalIndent(items, "", "    ")
+	if err != nil {
+		return fmt.Errorf("encode JSON: %w", err)
+	}
+
+	err = os.WriteFile(path, data, filePermissions)
+	if err != nil {
+		return fmt.Errorf("write JSON: %w", err)
+	}
+
+	return nil
 }
