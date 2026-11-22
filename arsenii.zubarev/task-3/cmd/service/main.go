@@ -105,7 +105,7 @@ func convertAndSort(valCurs ValCurs) []Currency {
 func saveJSON(path string, currencies []Currency) {
 	outputDir := filepath.Dir(path)
 
-	err := os.MkdirAll(outputDir, 0750)
+	err := os.MkdirAll(outputDir, 0o750)
 	if err != nil {
 		panic(err)
 	}
@@ -115,11 +115,12 @@ func saveJSON(path string, currencies []Currency) {
 		panic(err)
 	}
 
-	err = os.WriteFile(path, jsonData, 0600)
+	err = os.WriteFile(path, jsonData, 0o600)
 	if err != nil {
 		panic(err)
 	}
 }
+
 
 func main() {
 	var configPath string
