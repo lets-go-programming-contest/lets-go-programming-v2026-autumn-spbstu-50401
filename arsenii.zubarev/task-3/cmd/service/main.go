@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"encoding/xml"
 	"flag"
@@ -56,13 +57,12 @@ func loadConfig(path string) Config {
 }
 
 func loadXML(path string) ValCurs {
-	file, err := os.Open(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		panic(err)
 	}
-	defer file.Close()
 
-	decoder := xml.NewDecoder(file)
+	decoder := xml.NewDecoder(bytes.NewReader(data))
 	decoder.CharsetReader = charset.NewReaderLabel
 
 	var valCurs ValCurs
@@ -87,6 +87,7 @@ func convertAndSort(valCurs ValCurs) []Currency {
 		}
 
 		var currency Currency
+
 		currency.NumCode = valute.NumCode
 		currency.CharCode = valute.CharCode
 		currency.Value = parsedValue
@@ -104,7 +105,7 @@ func convertAndSort(valCurs ValCurs) []Currency {
 func saveJSON(path string, currencies []Currency) {
 	outputDir := filepath.Dir(path)
 
-	err := os.MkdirAll(outputDir, 0755)
+	err := os.MkdirAll(outputDir, 0750)
 	if err != nil {
 		panic(err)
 	}
@@ -114,7 +115,7 @@ func saveJSON(path string, currencies []Currency) {
 		panic(err)
 	}
 
-	err = os.WriteFile(path, jsonData, 0644)
+	err = os.WriteFile(path, jsonData, 0600)
 	if err != nil {
 		panic(err)
 	}
@@ -122,6 +123,7 @@ func saveJSON(path string, currencies []Currency) {
 
 func main() {
 	var configPath string
+
 	flag.StringVar(&configPath, "config", "", "path to yaml config file")
 	flag.Parse()
 
