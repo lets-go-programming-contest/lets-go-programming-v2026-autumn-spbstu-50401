@@ -1,8 +1,11 @@
 package main
 
 import (
+	"encoding/xml"
 	"flag"
 	"os"
+	"strconv"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
@@ -10,6 +13,17 @@ import (
 type Config struct {
 	InputFile  string `yaml:"input-file"`
 	OutputFile string `yaml:"output-file"`
+}
+
+type ValCurs struct {
+	XMLName xml.Name `xml:"ValCurs"`
+	Valutes []Valute `xml:"Valute"`
+}
+
+type Valute struct {
+	NumCode  string `xml:"NumCode"`
+	CharCode string `xml:"CharCode"`
+	Value    string `xml:"Value"`
 }
 
 func LoadConfig(path string) *Config {
@@ -24,6 +38,29 @@ func LoadConfig(path string) *Config {
 	return &cfg
 }
 
+func ParseXML(path string) []Valute {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		panic(err)
+	}
+
+	var vc ValCurs
+	if err := xml.Unmarshal(data, &vc); err != nil {
+		panic(err)
+	}
+
+	return vc.Valutes
+}
+
+func parseValue(s string) float64 {
+	s = strings.ReplaceAll(s, ",", ".")
+	f, err := strconv.ParseFloat(s, 64)
+	if err != nil {
+		panic(err)
+	}
+	return f
+}
+
 func main() {
 	configPath := flag.String("config", "", "path to yaml config")
 	flag.Parse()
@@ -33,4 +70,5 @@ func main() {
 	}
 
 	cfg := LoadConfig(*configPath)
+	valutes := ParseXML(cfg.InputFile)
 }
