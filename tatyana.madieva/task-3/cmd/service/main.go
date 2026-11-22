@@ -1,14 +1,19 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"encoding/xml"
 	"flag"
+	"io"
 	"os"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
 
+	"golang.org/x/text/encoding/charmap"
+	"golang.org/x/text/transform"
 	"gopkg.in/yaml.v3"
 )
 
@@ -49,11 +54,8 @@ func parseValue(s string) float64 {
 	return value
 }
 
-func main() {
-	configPath := flag.String("config", "config.yaml", "путь к файлу конфигурации")
-	flag.Parse()
-
-	data, err := os.ReadFile(*configPath)
+func readConfig(path string) Config {
+	data, err := os.ReadFile(path)
 	if err != nil {
 		panic(err)
 	}
@@ -65,40 +67,74 @@ func main() {
 		panic(err)
 	}
 
-	xmlData, err := os.ReadFile(config.Input)
+	return config
+}
+
+func parseXML(path string) ValCurs {
+	xmlData, err := os.ReadFile(path)
 	if err != nil {
 		panic(err)
 	}
 
 	var valCurs ValCurs
+	decoder := xml.NewDecoder(bytes.NewReader(xmlData))
+	decoder.CharsetReader = func(charset string, input io.Reader) (io.Reader, error) {
+		if charset == "windows-1251" {
+			return transform.NewReader(input, charmap.Windows1251.NewDecoder()), nil
+		}
+		return input, nil
+	}
 
-	err = xml.Unmarshal(xmlData, &valCurs)
+	err = decoder.Decode(&valCurs)
 	if err != nil {
 		panic(err)
 	}
 
-	var currencies = make([]ValuteJSON, len(valCurs.Valutes))
+	return valCurs
+}
 
-	for _, v := range valCurs.Valutes {
-		currency := ValuteJSON{
+func convertToJSON(valutes []Valute) []ValuteJSON {
+	currencies := make([]ValuteJSON, 0, len(valutes))
+	for _, v := range valutes {
+		currencies = append(currencies, ValuteJSON{
 			NumCode:  v.NumCode,
 			CharCode: v.CharCode,
 			Value:    parseValue(v.Value),
-		}
-		currencies = append(currencies, currency)
+		})
 	}
+	return currencies
+}
+
+func saveJSON(path string, data []ValuteJSON) {
+	dataOut, err := json.MarshalIndent(data, "", " ")
+	if err != nil {
+		panic(err)
+	}
+
+	outDir := filepath.Dir(path)
+
+	err = os.MkdirAll(outDir, 0o755)
+	if err != nil {
+		panic(err)
+	}
+
+	err = os.WriteFile(path, dataOut, 0o600)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func main() {
+	configPath := flag.String("config", "config.yaml", "путь к файлу конфигурации")
+	flag.Parse()
+
+	config := readConfig(*configPath)
+	valCurs := parseXML(config.Input)
+	currencies := convertToJSON(valCurs.Valutes)
 
 	sort.Slice(currencies, func(i, j int) bool {
 		return currencies[i].Value > currencies[j].Value
 	})
 
-	dataOut, err := json.MarshalIndent(currencies, "", " ")
-	if err != nil {
-		panic(err)
-	}
-
-	err = os.WriteFile(config.Output, dataOut, 0600)
-	if err != nil {
-		panic(err)
-	}
+	saveJSON(config.Output, currencies)
 }
