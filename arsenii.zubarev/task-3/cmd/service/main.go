@@ -15,6 +15,11 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+const (
+	dirPerm  = 0o750
+	filePerm = 0o600
+)
+
 type Config struct {
 	InputFile  string `yaml:"input-file"`
 	OutputFile string `yaml:"output-file"`
@@ -105,7 +110,7 @@ func convertAndSort(valCurs ValCurs) []Currency {
 func saveJSON(path string, currencies []Currency) {
 	outputDir := filepath.Dir(path)
 
-	err := os.MkdirAll(outputDir, 0o750)
+	err := os.MkdirAll(outputDir, dirPerm)
 	if err != nil {
 		panic(err)
 	}
@@ -115,12 +120,11 @@ func saveJSON(path string, currencies []Currency) {
 		panic(err)
 	}
 
-	err = os.WriteFile(path, jsonData, 0o600)
+	err = os.WriteFile(path, jsonData, filePerm)
 	if err != nil {
 		panic(err)
 	}
 }
-
 
 func main() {
 	var configPath string
