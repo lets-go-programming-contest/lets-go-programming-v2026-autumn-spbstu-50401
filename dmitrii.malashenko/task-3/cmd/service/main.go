@@ -63,7 +63,11 @@ func ParseXML(path string) []Valute {
 		panic(err)
 	}
 
-	defer file.Close()
+	defer func() {
+		if closeErr := file.Close(); closeErr != nil {
+			panic(closeErr)
+		}
+	}()
 
 	decoder := xml.NewDecoder(file)
 	decoder.CharsetReader = func(charset string, input io.Reader) (io.Reader, error) {
@@ -83,20 +87,48 @@ func ParseXML(path string) []Valute {
 	return valCurs.Valutes
 }
 
-func parseValue(s string) float64 {
-	s = strings.ReplaceAll(s, ",", ".")
+func parseValue(s string) (float64, bool) {
+	s = strings.ReplaceAll(strings.TrimSpace(s), ",", ".")
 
 	f, err := strconv.ParseFloat(s, 64)
 	if err != nil {
-		panic(err)
+		return 0, false
 	}
 
-	return f
+	return f, true
+}
+
+func toOutputCurrency(valute Valute) (OutputCurrency, bool) {
+	numCode := strings.TrimSpace(valute.NumCode)
+	charCode := strings.TrimSpace(valute.CharCode)
+
+	if numCode == "" || charCode == "" {
+		return OutputCurrency{}, false
+	}
+
+	num, err := strconv.Atoi(numCode)
+	if err != nil {
+		return OutputCurrency{}, false
+	}
+
+	value, ok := parseValue(valute.Value)
+	if !ok {
+		return OutputCurrency{}, false
+	}
+
+	return OutputCurrency{
+		NumCode:  num,
+		CharCode: charCode,
+		Value:    value,
+	}, true
 }
 
 func sortByValueDesc(valutes []Valute) {
-	sort.Slice(valutes, func(i, j int) bool {
-		return parseValue(valutes[i].Value) > parseValue(valutes[j].Value)
+	sort.SliceStable(valutes, func(i, j int) bool {
+		valueI, _ := parseValue(valutes[i].Value)
+		valueJ, _ := parseValue(valutes[j].Value)
+
+		return valueI > valueJ
 	})
 }
 
@@ -104,16 +136,12 @@ func SaveJSON(path string, valutes []Valute) {
 	out := make([]OutputCurrency, 0, len(valutes))
 
 	for _, valute := range valutes {
-		num, err := strconv.Atoi(valute.NumCode)
-		if err != nil {
-			panic(err)
+		item, ok := toOutputCurrency(valute)
+		if !ok {
+			continue
 		}
 
-		out = append(out, OutputCurrency{
-			NumCode:  num,
-			CharCode: valute.CharCode,
-			Value:    parseValue(valute.Value),
-		})
+		out = append(out, item)
 	}
 
 	data, err := json.MarshalIndent(out, "", "    ")
