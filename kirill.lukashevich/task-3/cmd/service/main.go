@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"encoding/xml"
 	"errors"
 	"flag"
 	"fmt"
@@ -21,7 +23,12 @@ func main() {
 		panic(err)
 	}
 
-	_ = config
+	currencies, err := readCurrencies(config.InputFile)
+	if err != nil {
+		panic(err)
+	}
+
+	_ = currencies
 }
 
 type Config struct {
@@ -47,4 +54,33 @@ func loadConfig(path string) (Config, error) {
 	}
 
 	return config, nil
+}
+
+type Currency struct {
+	NumCode  int    `xml:"NumCode"`
+	CharCode string `xml:"CharCode"`
+	Value    string `xml:"Value"`
+}
+
+type CurrencyList struct {
+	XMLName xml.Name   `xml:"ValCurs"`
+	Items   []Currency `xml:"Valute"`
+}
+
+func readCurrencies(path string) ([]Currency, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, fmt.Errorf("read XML: %w", err)
+	}
+
+	decoder := xml.NewDecoder(bytes.NewReader(data))
+
+	var currencies CurrencyList
+
+	err = decoder.Decode(&currencies)
+	if err != nil {
+		return nil, fmt.Errorf("decode XML: %w", err)
+	}
+
+	return currencies.Items, nil
 }
