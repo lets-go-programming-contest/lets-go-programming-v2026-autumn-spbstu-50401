@@ -7,6 +7,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -35,7 +36,9 @@ func main() {
 		panic(err)
 	}
 
-	_ = items
+	sort.SliceStable(items, func(i, j int) bool {
+		return items[i].Value > items[j].Value
+	})
 }
 
 type Config struct {
