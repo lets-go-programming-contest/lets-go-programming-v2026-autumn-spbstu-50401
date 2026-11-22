@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"encoding/xml"
+	"flag"
 	"os"
 	"sort"
 	"strconv"
@@ -49,12 +50,16 @@ func parseValue(s string) float64 {
 }
 
 func main() {
-	data, err := os.ReadFile("config.yaml")
+	configPath := flag.String("config", "config.yaml", "путь к файлу конфигурации")
+	flag.Parse()
+
+	data, err := os.ReadFile(*configPath)
 	if err != nil {
 		panic(err)
 	}
 
 	var config Config
+
 	err = yaml.Unmarshal(data, &config)
 	if err != nil {
 		panic(err)
@@ -66,12 +71,13 @@ func main() {
 	}
 
 	var valCurs ValCurs
+
 	err = xml.Unmarshal(xmlData, &valCurs)
 	if err != nil {
 		panic(err)
 	}
 
-	var currencies []ValuteJSON
+	var currencies = make([]ValuteJSON, len(valCurs.Valutes))
 
 	for _, v := range valCurs.Valutes {
 		currency := ValuteJSON{
@@ -90,7 +96,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	err = os.WriteFile(config.Output, dataOut, 0644)
+
+	err = os.WriteFile(config.Output, dataOut, 0600)
 	if err != nil {
 		panic(err)
 	}
