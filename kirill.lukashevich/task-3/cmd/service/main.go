@@ -7,16 +7,20 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
 
+	"golang.org/x/text/encoding/charmap"
 	"gopkg.in/yaml.v3"
 )
 
 var ErrInvalidConfig = errors.New("input-file and output-file must not be empty")
+
+var ErrUnknownCharset = errors.New("unsupported XML charset")
 
 func main() {
 	configPath := flag.String("config", "config.yaml", "Path to YAML config")
@@ -91,6 +95,13 @@ func readCurrencies(path string) ([]Currency, error) {
 	}
 
 	decoder := xml.NewDecoder(bytes.NewReader(data))
+	decoder.CharsetReader = func(label string, input io.Reader) (io.Reader, error) {
+		if strings.EqualFold(label, "windows-1251") {
+			return charmap.Windows1251.NewDecoder().Reader(input), nil
+		}
+
+		return nil, fmt.Errorf("%w: %s", ErrUnknownCharset, label)
+	}
 
 	var currencies CurrencyList
 
