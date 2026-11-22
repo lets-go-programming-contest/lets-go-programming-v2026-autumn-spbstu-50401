@@ -1,17 +1,17 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"encoding/xml"
 	"flag"
-	"io"
 	"os"
 	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
 
-	"golang.org/x/text/encoding/charmap"
+	"golang.org/x/net/html/charset"
 	"gopkg.in/yaml.v3"
 )
 
@@ -31,7 +31,7 @@ type ValCurs struct {
 }
 
 type Valute struct {
-	NumCode  string `xml:"NumCode"`
+	NumCode  int    `xml:"NumCode"`
 	CharCode string `xml:"CharCode"`
 	Value    string `xml:"Value"`
 }
@@ -58,25 +58,13 @@ func LoadConfig(path string) *Config {
 }
 
 func ParseXML(path string) []Valute {
-	file, err := os.Open(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		panic(err)
 	}
 
-	defer func() {
-		if closeErr := file.Close(); closeErr != nil {
-			panic(closeErr)
-		}
-	}()
-
-	decoder := xml.NewDecoder(file)
-	decoder.CharsetReader = func(charset string, input io.Reader) (io.Reader, error) {
-		if charset == "windows-1251" {
-			return charmap.Windows1251.NewDecoder().Reader(input), nil
-		}
-
-		return input, nil
-	}
+	decoder := xml.NewDecoder(bytes.NewReader(data))
+	decoder.CharsetReader = charset.NewReaderLabel
 
 	var valCurs ValCurs
 
@@ -87,51 +75,28 @@ func ParseXML(path string) []Valute {
 	return valCurs.Valutes
 }
 
-func parseValue(s string) (float64, bool) {
+func parseValue(s string) float64 {
 	s = strings.ReplaceAll(strings.TrimSpace(s), ",", ".")
 
 	f, err := strconv.ParseFloat(s, 64)
 	if err != nil {
-		return 0, false
+		panic(err)
 	}
 
-	return f, true
+	return f
 }
 
-func toOutputCurrency(valute Valute) (OutputCurrency, bool) {
-	charCode := strings.TrimSpace(valute.CharCode)
-	if charCode == "" {
-		return OutputCurrency{NumCode: 0, CharCode: "", Value: 0}, false
-	}
-
-	numCode := strings.TrimSpace(valute.NumCode)
-	num := 0
-
-	if numCode != "" {
-		parsed, err := strconv.Atoi(numCode)
-		if err == nil {
-			num = parsed
-		}
-	}
-
-	value, ok := parseValue(valute.Value)
-	if !ok {
-		return OutputCurrency{NumCode: 0, CharCode: "", Value: 0}, false
-	}
-
+func toOutputCurrency(valute Valute) OutputCurrency {
 	return OutputCurrency{
-		NumCode:  num,
-		CharCode: charCode,
-		Value:    value,
-	}, true
+		NumCode:  valute.NumCode,
+		CharCode: strings.TrimSpace(valute.CharCode),
+		Value:    parseValue(valute.Value),
+	}
 }
 
 func sortByValueDesc(valutes []Valute) {
 	sort.SliceStable(valutes, func(i, j int) bool {
-		valueI, _ := parseValue(valutes[i].Value)
-		valueJ, _ := parseValue(valutes[j].Value)
-
-		return valueI > valueJ
+		return parseValue(valutes[i].Value) > parseValue(valutes[j].Value)
 	})
 }
 
@@ -139,12 +104,7 @@ func SaveJSON(path string, valutes []Valute) {
 	out := make([]OutputCurrency, 0, len(valutes))
 
 	for _, valute := range valutes {
-		item, ok := toOutputCurrency(valute)
-		if !ok {
-			continue
-		}
-
-		out = append(out, item)
+		out = append(out, toOutputCurrency(valute))
 	}
 
 	data, err := json.MarshalIndent(out, "", "    ")
