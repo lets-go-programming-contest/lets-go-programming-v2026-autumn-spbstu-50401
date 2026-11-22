@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"flag"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -61,6 +62,12 @@ func parseValue(s string) float64 {
 	return f
 }
 
+func sortByValueDesc(valutes []Valute) {
+	sort.Slice(valutes, func(i, j int) bool {
+		return parseValue(valutes[i].Value) > parseValue(valutes[j].Value)
+	})
+}
+
 func main() {
 	configPath := flag.String("config", "", "path to yaml config")
 	flag.Parse()
@@ -71,4 +78,6 @@ func main() {
 
 	cfg := LoadConfig(*configPath)
 	valutes := ParseXML(cfg.InputFile)
+	sortByValueDesc(valutes)
+
 }
