@@ -17,6 +17,11 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+const (
+	dirPerm  = 0o755
+	filePerm = 0o600
+)
+
 type Config struct {
 	Input  string `yaml:"input-file"`
 	Output string `yaml:"output-file"`
@@ -77,11 +82,13 @@ func parseXML(path string) ValCurs {
 	}
 
 	var valCurs ValCurs
+
 	decoder := xml.NewDecoder(bytes.NewReader(xmlData))
 	decoder.CharsetReader = func(charset string, input io.Reader) (io.Reader, error) {
 		if charset == "windows-1251" {
 			return transform.NewReader(input, charmap.Windows1251.NewDecoder()), nil
 		}
+
 		return input, nil
 	}
 
@@ -102,6 +109,7 @@ func convertToJSON(valutes []Valute) []ValuteJSON {
 			Value:    parseValue(v.Value),
 		})
 	}
+
 	return currencies
 }
 
@@ -113,12 +121,12 @@ func saveJSON(path string, data []ValuteJSON) {
 
 	outDir := filepath.Dir(path)
 
-	err = os.MkdirAll(outDir, 0o755)
+	err = os.MkdirAll(outDir, dirPerm)
 	if err != nil {
 		panic(err)
 	}
 
-	err = os.WriteFile(path, dataOut, 0o600)
+	err = os.WriteFile(path, dataOut, filePerm)
 	if err != nil {
 		panic(err)
 	}
