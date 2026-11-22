@@ -4,13 +4,20 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"flag"
+	"io"
 	"os"
 	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
 
+	"golang.org/x/text/encoding/charmap"
 	"gopkg.in/yaml.v3"
+)
+
+const (
+	dirPerm  = 0o755
+	filePerm = 0o600
 )
 
 type Config struct {
@@ -40,33 +47,50 @@ func LoadConfig(path string) *Config {
 	if err != nil {
 		panic(err)
 	}
+
 	var cfg Config
+
 	if err := yaml.Unmarshal(data, &cfg); err != nil {
 		panic(err)
 	}
+
 	return &cfg
 }
 
 func ParseXML(path string) []Valute {
-	data, err := os.ReadFile(path)
+	file, err := os.Open(path)
 	if err != nil {
 		panic(err)
 	}
 
-	var vc ValCurs
-	if err := xml.Unmarshal(data, &vc); err != nil {
+	defer file.Close()
+
+	decoder := xml.NewDecoder(file)
+	decoder.CharsetReader = func(charset string, input io.Reader) (io.Reader, error) {
+		if charset == "windows-1251" {
+			return charmap.Windows1251.NewDecoder().Reader(input), nil
+		}
+
+		return input, nil
+	}
+
+	var valCurs ValCurs
+
+	if err := decoder.Decode(&valCurs); err != nil {
 		panic(err)
 	}
 
-	return vc.Valutes
+	return valCurs.Valutes
 }
 
 func parseValue(s string) float64 {
 	s = strings.ReplaceAll(s, ",", ".")
+
 	f, err := strconv.ParseFloat(s, 64)
 	if err != nil {
 		panic(err)
 	}
+
 	return f
 }
 
@@ -78,15 +102,17 @@ func sortByValueDesc(valutes []Valute) {
 
 func SaveJSON(path string, valutes []Valute) {
 	out := make([]OutputCurrency, 0, len(valutes))
-	for _, v := range valutes {
-		num, err := strconv.Atoi(v.NumCode)
+
+	for _, valute := range valutes {
+		num, err := strconv.Atoi(valute.NumCode)
 		if err != nil {
 			panic(err)
 		}
+
 		out = append(out, OutputCurrency{
 			NumCode:  num,
-			CharCode: v.CharCode,
-			Value:    parseValue(v.Value),
+			CharCode: valute.CharCode,
+			Value:    parseValue(valute.Value),
 		})
 	}
 
@@ -96,12 +122,12 @@ func SaveJSON(path string, valutes []Valute) {
 	}
 
 	if dir := filepath.Dir(path); dir != "" && dir != "." {
-		if err := os.MkdirAll(dir, 0o755); err != nil {
+		if err := os.MkdirAll(dir, dirPerm); err != nil {
 			panic(err)
 		}
 	}
 
-	if err := os.WriteFile(path, data, 0o644); err != nil {
+	if err := os.WriteFile(path, data, filePerm); err != nil {
 		panic(err)
 	}
 }
@@ -118,5 +144,4 @@ func main() {
 	valutes := ParseXML(cfg.InputFile)
 	sortByValueDesc(valutes)
 	SaveJSON(cfg.OutputFile, valutes)
-
 }
