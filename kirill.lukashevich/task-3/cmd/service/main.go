@@ -8,6 +8,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -126,12 +127,19 @@ func convertCurrencies(currencies []Currency) ([]OutputItem, error) {
 	return items, nil
 }
 
+const dirPermissions = 0o750
+
 const filePermissions = 0o600
 
 func saveCurrencies(path string, items []OutputItem) error {
 	data, err := json.MarshalIndent(items, "", "    ")
 	if err != nil {
 		return fmt.Errorf("encode JSON: %w", err)
+	}
+
+	err = os.MkdirAll(filepath.Dir(path), dirPermissions)
+	if err != nil {
+		return fmt.Errorf("create output directory: %w", err)
 	}
 
 	err = os.WriteFile(path, data, filePermissions)
