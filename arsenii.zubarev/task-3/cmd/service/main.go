@@ -1,9 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"encoding/xml"
 	"flag"
 	"os"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -93,6 +95,22 @@ func convertAndSort(valCurs ValCurs) []Currency {
 	return currencies
 }
 
+func saveJSON(path string, currencies []Currency) {
+	dir := filepath.Dir(path)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		panic(err)
+	}
+
+	data, err := json.MarshalIndent(currencies, "", "  ")
+	if err != nil {
+		panic(err)
+	}
+
+	if err := os.WriteFile(path, data, 0644); err != nil {
+		panic(err)
+	}
+}
+
 func main() {
 	configPath := flag.String("config", "", "path to yaml config file")
 	flag.Parse()
@@ -103,5 +121,6 @@ func main() {
 
 	cfg := loadConfig(*configPath)
 	valCurs := loadXML(cfg.InputFile)
-	_ = convertAndSort(valCurs)
+	currencies := convertAndSort(valCurs)
+	saveJSON(cfg.OutputFile, currencies)
 }
